@@ -1,0 +1,258 @@
+<!--
+周期表暗記ツール 乱数表示バージョン
+Copyright (c) 2025, FUJIHARA Kazuhiro
+-->
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>周期表暗記ツール</title>
+  <style>
+    body {
+      font-family: sans-serif;
+    }
+
+    #random-button {
+      width: 100px;
+      height: 50px;
+      margin: 10px;
+      border: 1px solid #ccc;
+      font-size: 18px;
+      background-color: #f0f0f0;
+      cursor: pointer;
+    }
+
+    #random-button:hover {
+      background-color: #ddd;
+    }
+
+    #random-display {
+      width: 100px;
+      height: 100px;
+      margin: 10px;
+      border: 10px;
+      font-size: 36px;
+      background-color: #eef;
+      border: 1px solid #99c;
+      color: red;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .periodic-table {
+      display: grid;
+      grid-template-columns: repeat(18, 50px);
+      gap: 2px;
+      margin: 20px;
+    }
+
+    .element {
+      width: 50px;
+      height: 50px;
+      background-color: #f0f0f0;
+      border: 1px solid #ccc;
+      text-align: center;
+      line-height: 50px;
+      font-size: 14px;
+      cursor: pointer;
+      position: relative;
+    }
+
+    .element:hover {
+      background-color: #ddd;
+    }
+
+    .f-orbital {
+      overflow-wrap: break-word;
+      font-size: 14px;
+      line-height: 24px;
+    }
+
+    #element-info {
+      margin-top: 20px;
+      padding: 10px;
+      font-size: 18px;
+      background: #eef;
+      border: 1px solid #99c;
+      width: fit-content;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>周期表暗記ツール</h1>
+
+  <div id="random-button">原子番号を表示</div>
+
+  <div id="random-display"></div>
+
+  <div class="periodic-table" id="table"></div>
+
+  <div id="element-info">元素名がここに表示されます</div>
+
+  <script>
+    const elements = [
+      { number: 1, symbol: "H", name: "水素", x: 1, y: 1 },
+      { number: 2, symbol: "He", name: "ヘリウム", x: 18, y: 1 },
+      { number: 3, symbol: "Li", name: "リチウム", x: 1, y: 2 },
+      { number: 4, symbol: "Be", name: "ベリリウム", x: 2, y: 2 },
+      { number: 5, symbol: "B", name: "ホウ素", x: 13, y: 2 },
+      { number: 6, symbol: "C", name: "炭素", x: 14, y: 2 },
+      { number: 7, symbol: "N", name: "窒素", x: 15, y: 2 },
+      { number: 8, symbol: "O", name: "酸素", x: 16, y: 2 },
+      { number: 9, symbol: "F", name: "フッ素", x: 17, y: 2 },
+      { number: 10, symbol: "Ne", name: "ネオン", x: 18, y: 2 },
+      { number: 11, symbol: "Na", name: "ナトリウム", x: 1, y: 3 },
+      { number: 12, symbol: "Mg", name: "マグネシウム", x: 2, y: 3 },
+      { number: 13, symbol: "Al", name: "アルミニウム", x: 13, y: 3 },
+      { number: 14, symbol: "Si", name: "ケイ素", x: 14, y: 3 },
+      { number: 15, symbol: "P", name: "リン", x: 15, y: 3 },
+      { number: 16, symbol: "S", name: "硫黄", x: 16, y: 3 },
+      { number: 17, symbol: "Cl", name: "塩素", x: 17, y: 3 },
+      { number: 18, symbol: "Ar", name: "アルゴン", x: 18, y: 3 },
+      { number: 19, symbol: "K", name: "カリウム", x: 1, y: 4 },
+      { number: 20, symbol: "Ca", name: "カルシウム", x: 2, y: 4 },
+      { number: 21, symbol: "Sc", name: "スカンジウム", x: 3, y: 4 },
+      { number: 22, symbol: "Ti", name: "チタン", x: 4, y: 4 },
+      { number: 23, symbol: "V", name: "バナジウム", x: 5, y: 4 },
+      { number: 24, symbol: "Cr", name: "クロム", x: 6, y: 4 },
+      { number: 25, symbol: "Mn", name: "マンガン", x: 7, y: 4 },
+      { number: 26, symbol: "Fe", name: "鉄", x: 8, y: 4 },
+      { number: 27, symbol: "Co", name: "コバルト", x: 9, y: 4 },
+      { number: 28, symbol: "Ni", name: "ニッケル", x: 10, y: 4 },
+      { number: 29, symbol: "Cu", name: "銅", x: 11, y: 4 },
+      { number: 30, symbol: "Zn", name: "亜鉛", x: 12, y: 4 },
+      { number: 31, symbol: "Ga", name: "ガリウム", x: 13, y: 4 },
+      { number: 32, symbol: "Ge", name: "ゲルマニウム", x: 14, y: 4 },
+      { number: 33, symbol: "As", name: "ヒ素", x: 15, y: 4 },
+      { number: 34, symbol: "Se", name: "セレン", x: 16, y: 4 },
+      { number: 35, symbol: "Br", name: "臭素", x: 17, y: 4 },
+      { number: 36, symbol: "Kr", name: "クリプトン", x: 18, y: 4 },
+      { number: 37, symbol: "Rb", name: "ルビジウム", x: 1, y: 5 },
+      { number: 38, symbol: "Sr", name: "ストロンチウム", x: 2, y: 5 },
+      { number: 39, symbol: "Y", name: "イットリウム", x: 3, y: 5 },
+      { number: 40, symbol: "Zr", name: "ジルコニウム", x: 4, y: 5 },
+      { number: 41, symbol: "Nb", name: "ニオブ", x: 5, y: 5 },
+      { number: 42, symbol: "Mo", name: "モリブデン", x: 6, y: 5 },
+      { number: 43, symbol: "Tc", name: "テクネチウム", x: 7, y: 5 },
+      { number: 44, symbol: "Ru", name: "ルテニウム", x: 8, y: 5 },
+      { number: 45, symbol: "Rh", name: "ロジウム", x: 9, y: 5 },
+      { number: 46, symbol: "Pd", name: "パラジウム", x: 10, y: 5 },
+      { number: 47, symbol: "Ag", name: "銀", x: 11, y: 5 },
+      { number: 48, symbol: "Cd", name: "カドミウム", x: 12, y: 5 },
+      { number: 49, symbol: "In", name: "インジウム", x: 13, y: 5 },
+      { number: 50, symbol: "Sn", name: "スズ", x: 14, y: 5 },
+      { number: 51, symbol: "Sb", name: "アンチモン", x: 15, y: 5 },
+      { number: 52, symbol: "Te", name: "テルル", x: 16, y: 5 },
+      { number: 53, symbol: "I", name: "ヨウ素", x: 17, y: 5 },
+      { number: 54, symbol: "Xe", name: "キセノン", x: 18, y: 5 },
+      { number: 55, symbol: "Cs", name: "セシウム", x: 1, y: 6 },
+      { number: 56, symbol: "Ba", name: "バリウム", x: 2, y: 6 },
+      { number: 57, symbol: "La", name: "ランタン", x: 3, y: 9 },
+      { number: 58, symbol: "Ce", name: "セリウム", x: 4, y: 9 },
+      { number: 59, symbol: "Pr", name: "プラセオジム", x: 5, y: 9 },
+      { number: 60, symbol: "Nd", name: "ネオジム", x: 6, y: 9 },
+      { number: 61, symbol: "Pm", name: "プロメチウム", x: 7, y: 9 },
+      { number: 62, symbol: "Sm", name: "サマリウム", x: 8, y: 9 },
+      { number: 63, symbol: "Eu", name: "ユウロピウム", x: 9, y: 9 },
+      { number: 64, symbol: "Gd", name: "ガドリニウム", x: 10, y: 9 },
+      { number: 65, symbol: "Tb", name: "テルビウム", x: 11, y: 9 },
+      { number: 66, symbol: "Dy", name: "ジスプロシウム", x: 12, y: 9 },
+      { number: 67, symbol: "Ho", name: "ホルミウム", x: 13, y: 9 },
+      { number: 68, symbol: "Er", name: "エルビウム", x: 14, y: 9 },
+      { number: 69, symbol: "Tm", name: "ツリウム", x: 15, y: 9 },
+      { number: 70, symbol: "Yb", name: "イッテルビウム", x: 16, y: 9 },
+      { number: 71, symbol: "Lu", name: "ルテチウム", x: 17, y: 9 },
+      { number: 72, symbol: "Hf", name: "ハフニウム", x: 4, y: 6 },
+      { number: 73, symbol: "Ta", name: "タンタル", x: 5, y: 6 },
+      { number: 74, symbol: "W", name: "タングステン", x: 6, y: 6 },
+      { number: 75, symbol: "Re", name: "レニウム", x: 7, y: 6 },
+      { number: 76, symbol: "Os", name: "オスミウム", x: 8, y: 6 },
+      { number: 77, symbol: "Ir", name: "イリジウム", x: 9, y: 6 },
+      { number: 78, symbol: "Pt", name: "白金", x: 10, y: 6 },
+      { number: 79, symbol: "Au", name: "金", x: 11, y: 6 },
+      { number: 80, symbol: "Hg", name: "水銀", x: 12, y: 6 },
+      { number: 81, symbol: "Tl", name: "タリウム", x: 13, y: 6 },
+      { number: 82, symbol: "Pb", name: "鉛", x: 14, y: 6 },
+      { number: 83, symbol: "Bi", name: "ビスマス", x: 15, y: 6 },
+      { number: 84, symbol: "Po", name: "ポロニウム", x: 16, y: 6 },
+      { number: 85, symbol: "At", name: "アスタチン", x: 17, y: 6 },
+      { number: 86, symbol: "Rn", name: "ラドン", x: 18, y: 6 },
+      { number: 87, symbol: "Fr", name: "フランシウム", x: 1, y: 7 },
+      { number: 88, symbol: "Ra", name: "ラジウム", x: 2, y: 7 },
+      { number: 89, symbol: "Ac", name: "アクチニウム", x: 3, y: 10 },
+      { number: 90, symbol: "Th", name: "トリウム", x: 4, y: 10 },
+      { number: 91, symbol: "Pa", name: "プロトアクチニウム", x: 5, y: 10 },
+      { number: 92, symbol: "U", name: "ウラン", x: 6, y: 10 },
+      { number: 93, symbol: "Np", name: "ネプツニウム", x: 7, y: 10 },
+      { number: 94, symbol: "Pu", name: "プルトニウム", x: 8, y: 10 },
+      { number: 95, symbol: "Am", name: "アメリシウム", x: 9, y: 10 },
+      { number: 96, symbol: "Cm", name: "キュリウム", x: 10, y: 10 },
+      { number: 97, symbol: "Bk", name: "バークリウム", x: 11, y: 10 },
+      { number: 98, symbol: "Cf", name: "カリホルニウム", x: 12, y: 10 },
+      { number: 99, symbol: "Es", name: "アインスタイニウム", x: 13, y: 10 },
+      { number: 100, symbol: "Fm", name: "フェルミウム", x: 14, y: 10 },
+      { number: 101, symbol: "Md", name: "メンデレビウム", x: 15, y: 10 },
+      { number: 102, symbol: "No", name: "ノーベリウム", x: 16, y: 10 },
+      { number: 103, symbol: "Lr", name: "ローレンシウム", x: 17, y: 10 },
+      { number: 104, symbol: "Rf", name: "ラザホージウム", x: 4, y: 7 },
+      { number: 105, symbol: "Db", name: "ドブニウム", x: 5, y: 7 },
+      { number: 106, symbol: "Sg", name: "シーボーギウム", x: 6, y: 7 },
+      { number: 107, symbol: "Bh", name: "ボーリウム", x: 7, y: 7 },
+      { number: 108, symbol: "Hs", name: "ハッシウム", x: 8, y: 7 },
+      { number: 109, symbol: "Mt", name: "マイトネリウム", x: 9, y: 7 },
+      { number: 110, symbol: "Ds", name: "ダームスタチウム", x: 10, y: 7 },
+      { number: 111, symbol: "Rg", name: "レントゲニウム", x: 11, y: 7 },
+      { number: 112, symbol: "Cn", name: "コペルニシウム", x: 12, y: 7 },
+      { number: 113, symbol: "Nh", name: "ニホニウム", x: 13, y: 7 },
+      { number: 114, symbol: "Fl", name: "フレロビウム", x: 14, y: 7 },
+      { number: 115, symbol: "Mc", name: "モスコビウム", x: 15, y: 7 },
+      { number: 116, symbol: "Lv", name: "リバモリウム", x: 16, y: 7 },
+      { number: 117, symbol: "Ts", name: "テネシン", x: 17, y: 7 },
+      { number: 118, symbol: "Og", name: "オガネソン", x: 18, y: 7 },
+      { number: 999, symbol: "",   name: "ランタノイド", x: 3, y: 6 },
+      { number: 999, symbol: "",   name: "ランタノイド", x: 2, y: 9 },
+      { number: 999, symbol: "",   name: "アクチノイド", x: 3, y: 7 },
+      { number: 999, symbol: "",   name: "アクチノイド", x: 2, y: 10}
+    ];
+    const randMin = 1;
+    const randMax = 118;
+
+    const randomButton = document.getElementById('random-button');
+    const randomDisplay = document.getElementById('random-display');
+    const table = document.getElementById('table');
+    const infoBox = document.getElementById('element-info');
+
+    randomButton.onclick = () => {
+      const rand = Math.floor(Math.random() * (randMax + 1 - randMin)) + randMin;
+      randomDisplay.textContent = rand;
+    }
+
+    for (let i = 1; i <= 10; i++) {
+      for (let j = 1; j <= 18; j++) {
+        const cell = document.createElement('div');
+        cell.className = 'element';
+        table.appendChild(cell);
+      }
+    }
+
+    elements.forEach(el => {
+      const index = (el.y - 1) * 18 + (el.x - 1);
+      const cell = table.children[index];
+      if (el.number !== 999) {
+        cell.textContent = el.number;
+
+        cell.onclick = () => {
+          infoBox.textContent = `${el.number}: ${el.symbol}（${el.name}）`;
+        };
+      } else {
+        cell.classList.add("f-orbital");
+        cell.textContent = el.name;
+      }
+    });
+
+
+  </script>
+</body>
+</html>
